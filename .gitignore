@@ -5,3 +5,4 @@ dumped_js/
 *.log
 script_inline_*.js
 .cook45/
+tests_and_dumps/
