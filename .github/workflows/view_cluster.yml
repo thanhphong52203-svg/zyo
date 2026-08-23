@@ -1,0 +1,50 @@
+name: Sovereign View Cluster
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_user:
+        description: 'Target Zyo Username'
+        required: true
+        default: 'thanhphong.xq'
+      cycles:
+        description: 'Cycles per worker'
+        required: true
+        default: '3'
+  schedule:
+    - cron: '*/20 * * * *'
+
+concurrency:
+  group: sovereign-cluster
+  cancel-in-progress: false
+
+jobs:
+  matrix-cluster:
+    name: Azure-Node-${{ matrix.worker_id }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        worker_id: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python Runtime
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          pip install playwright curl_cffi requests
+          playwright install chromium --with-deps
+
+      - name: Execute Node View Cycle
+        env:
+          WORKER_ID: ${{ matrix.worker_id }}
+          TARGET_USER: ${{ github.event.inputs.target_user || 'thanhphong.xq' }}
+          CYCLES: ${{ github.event.inputs.cycles || '3' }}
+        run: |
+          python runner.py

@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+dumped_js/
+*.html
+*.log
+script_inline_*.js
+.cook45/
