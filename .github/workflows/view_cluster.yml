@@ -36,15 +36,16 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
-      - name: Install Dependencies
+      - name: Install Dependencies & Xvfb
         run: |
+          sudo apt-get update -y && sudo apt-get install -y xvfb
           pip install playwright curl_cffi requests
           playwright install chromium --with-deps
 
-      - name: Execute Node View Cycle
+      - name: Execute Node View Cycle (Xvfb Virtual Display)
         env:
           WORKER_ID: ${{ matrix.worker_id }}
           TARGET_USER: ${{ github.event.inputs.target_user || 'thanhphong.xq' }}
           CYCLES: ${{ github.event.inputs.cycles || '3' }}
         run: |
-          python runner.py
+          xvfb-run --auto-servernum --server-args="-screen 0 1366x768x24" python runner.py
